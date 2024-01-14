@@ -1,0 +1,14 @@
+{
+  "name": "google-drive-admin",
+  "version": "1.0.0",
+  "description": "Google Drive Admin",
+  "scripts": {
+    "prepush:dev": "node -e \"require('fs').copyFileSync('./.clasp.json.dev', './.clasp.json')\"",
+    "prepush:prod": "node -e \"require('fs').copyFileSync('./.clasp.json.prod', './.clasp.json')\"",
+    "push:dev": "clasp push",
+    "push:prod": "clasp push"
+  },
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.56"
+  }
+}
