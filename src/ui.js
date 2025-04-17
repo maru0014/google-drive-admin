@@ -80,6 +80,35 @@ function btn_insertPermissions() {
     return;
   }
 
-  const sendNotificationEmail = sheets.insertPermission.getRange("権限追加_メール通知する").getValue();
-  insertPermissions(email, role, sendNotificationEmail);
+  insertPermissions(email, role);
+}
+
+function btn_changeOwner() {
+  const dialog = Browser.msgBox("オーナー変更を実行しますか？", Browser.Buttons.OK_CANCEL);
+
+  if (dialog === "cancel") {
+    Browser.msgBox("処理を中断します");
+    return;
+  }
+
+  changeOwner();
+}
+
+function btn_searchDrives() {
+  const dialog = Browser.msgBox("検索を実行しますか？", Browser.Buttons.YES_NO);
+  if (dialog === "no") {
+    Browser.msgBox("処理を中断します");
+    return;
+  }
+
+  searchDrives();
+}
+
+function btn_clearDriveSearchResults() {
+  const dialog = Browser.msgBox("検索結果をクリアしますか？", Browser.Buttons.YES_NO);
+  if (dialog === "yes") {
+    const lastCol = sheets.drives.getLastColumn();
+    const lastRow = sheets.drives.getLastRow();
+    sheets.drives.getRange(7, 1, lastRow, lastCol).clearContent();
+  }
 }

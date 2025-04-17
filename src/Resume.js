@@ -2,18 +2,16 @@
 class Resume {
   /**
    * コンストラクタ
-   * @param {object} props - スクリプトプロパティ
-   * @param {string} key - スクリプトプロパティキー
+   * @param {SpreadSheet.Sheet} sheet - データ保存先シート
    */
-  constructor(props, key) {
-    this.props = props;
-    this.key = key;
+  constructor(sheet) {
+    this.sheet = sheet;
 
     // 実行開始時間
     this.startTime = new Date();
     // トリガー登録済みかどうか
     this.registeredResume = false;
-     // 有料アカウント: 29分, 無料アカウント: 5分
+    // 有料アカウント: 29分, 無料アカウント: 5分
     this.targetSeconds = this.isPaidUser() ? 1740 : 300;
   }
 
@@ -40,7 +38,9 @@ class Resume {
    * @returns {Array} レジュームデータ
    */
   loadData() {
-    return JSON.parse(this.props.getProperty(this.key) || "[]");
+    const table = this.sheet.getDataRange().getValues();
+    const data = table2Object(table);
+    return data;
   }
 
   /**
@@ -49,10 +49,9 @@ class Resume {
    * @returns {Array} 更新後のレジュームデータ
    */
   updateData(data) {
-    const resumeData = this.loadData();
-    const updatedData = [data].concat(resumeData);
-    props.setProperty(this.key, JSON.stringify(updatedData));
-    return updatedData;
+    const newData = object2Array(data);
+    this.sheet.insertRowBefore(2);
+    this.sheet.getRange(2, 1, 1, newData.length).setValues([newData]);
   }
 
   /**
@@ -62,8 +61,11 @@ class Resume {
    */
   removeData(id) {
     const resumeData = this.loadData();
-    const removedData = resumeData.filter((d) => d.id !== id);
-    props.setProperty(this.key, JSON.stringify(removedData));
+    for (let i = 0; i < resumeData.length; i++) {
+      if (resumeData[i].id === id) {
+        this.sheet.deleteRow(i + 2);
+      }
+    }
   }
 
   /**
@@ -71,7 +73,9 @@ class Resume {
    * @param {string} key - スクリプトプロパティキー
    */
   clearData() {
-    props.setProperty(this.key, "[]");
+    const lastRow = this.sheet.getLastRow();
+    const lastCol = this.sheet.getLastColumn();
+    this.sheet.getRange(2, 1, lastRow, lastCol).clearContent();
   }
 
   /**
