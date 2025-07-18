@@ -9,6 +9,7 @@ const sheets = {
   removePermission: ss.getSheetByName("権限削除"),
   changeOwner: ss.getSheetByName("オーナー変更"),
   drives: ss.getSheetByName("共有ドライブ一覧"),
+  formSettings: ss.getSheetByName("フォーム設定確認"),
 }
 
 // load script properties
@@ -18,6 +19,6 @@ const props = PropertiesService.getScriptProperties();
 const searchTask = new Resume(sheets.searchFolders);
 
 // constants
-const FILE_AND_PERMISSION_FIELDS = "nextPageToken, files(id,shortcutDetails,name,mimeType,permissions,parents)";
-const FILE_FIELDS = "nextPageToken, files(id,shortcutDetails,name,mimeType,parents)";
+const FILE_AND_PERMISSION_FIELDS = "nextPageToken, files(id,shortcutDetails,name,mimeType,permissions,parents,driveId)";
+const FILE_FIELDS = "nextPageToken, files(id,shortcutDetails,name,mimeType,parents,driveId)";
 const DRIVE_FIELDS = "nextPageToken, drives(id,name,createdTime,restrictions)";

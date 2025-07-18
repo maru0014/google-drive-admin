@@ -7,6 +7,7 @@ function btn_search() {
 
   const getPermissions = sheets.search.getRange("検索_権限出力").getValue();
   const q = sheets.search.getRange("検索_クエリ").getValue();
+  const supportsAllDrives = sheets.search.getRange("検索_共有ドライブ").getValue();
   const getSubfolders = q ? false : sheets.search.getRange("検索_サブフォルダも検索").getValue();
   const folderId = q ? "" : sheets.search.getRange("検索_対象フォルダID").getValue();
 
@@ -16,10 +17,10 @@ function btn_search() {
   const isResume = resumeData.length && Browser.msgBox("検索途中のデータが見つかりました。再開しますか？", Browser.Buttons.YES_NO);
   if (isResume === "yes") {
     // resumeDataがあれば再開する
-    resumeSearch(resumeData, q, getPermissions, getSubfolders);
+    resumeSearch(resumeData, q, supportsAllDrives, getPermissions, getSubfolders);
   } else {
     searchTask.clearData();
-    search(folderId, q, getPermissions, getSubfolders);
+    search(folderId, q, supportsAllDrives, getPermissions, getSubfolders);
   }
 
   if (searchTask.isCompleted()) {
@@ -110,5 +111,25 @@ function btn_clearDriveSearchResults() {
     const lastCol = sheets.drives.getLastColumn();
     const lastRow = sheets.drives.getLastRow();
     sheets.drives.getRange(7, 1, lastRow, lastCol).clearContent();
+  }
+}
+
+function btn_getFormSettings() {
+  const dialog = Browser.msgBox("フォーム設定確認を実行しますか？", Browser.Buttons.YES_NO);
+  if (dialog === "no") {
+    Browser.msgBox("処理を中断します");
+    return;
+  }
+
+  getFormSettingsAll();
+}
+
+function btn_clearFormSettings() {
+  const dialog = Browser.msgBox("結果をクリアしますか？", Browser.Buttons.YES_NO);
+  if (dialog === "yes") {
+    const lastCol = sheets.formSettings.getLastColumn();
+    const lastRow = sheets.formSettings.getLastRow();
+    sheets.formSettings.getRange(5, 1, lastRow, lastCol).clearContent();
+    sheets.formSettings.getRange(5, 1, lastRow, lastCol).clearDataValidations();
   }
 }

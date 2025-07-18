@@ -32,11 +32,13 @@ function insertPermissions(email, role) {
     return;
   }
 
+  const sendNotificationEmail = sheets.insertPermission.getRange("権限追加_メールで通知する").getValue();
+
   for (let i = 6; i <= lastRow; i++) {
     const itemId = sheets.insertPermission.getRange(i, 1).getValue();
     const status = sheets.insertPermission.getRange(i, 3).getValue();
     if (itemId && status === "") {
-      const result = insertPermission(itemId, email, role);
+      const result = insertPermission(itemId, email, role, sendNotificationEmail);
       sheets.insertPermission.getRange(i, 3).setValue(result);
     }
   }
@@ -59,8 +61,8 @@ function changeOwner() {
     const itemId = sheets.changeOwner.getRange(i, 1).getValue();
     const email = sheets.changeOwner.getRange(i, 2).getValue();
     const status = sheets.changeOwner.getRange(i, 3).getValue();
-    if (itemId && newOwner && status === "") {
-      const result = changeOwner(itemId, email, role);
+    if (itemId && email && status === "") {
+      const result = insertPermission(itemId, email, role);
       sheets.changeOwner.getRange(i, 3).setValue(result);
     }
   }

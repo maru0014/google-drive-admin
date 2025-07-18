@@ -1,6 +1,6 @@
 {
   "name": "google-drive-admin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Googleドライブ管理ツール",
   "scripts": {
     "prepush:dev": "node -e \"require('fs').copyFileSync('./.clasp.json.dev', './.clasp.json')\"",

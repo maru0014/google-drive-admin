@@ -45,8 +45,14 @@ function searchItems(folderId, q, supportsAllDrives = false, includeItemsFromAll
 
   if (includeItemsFromAllDrives && /permissions/.test(fields)) {
     fileList = fileList.map((f) => {
-      const p = getPermissions(f.id);
-      return { ...f, ...p };
+      try {
+        const p = getPermissions(f.id);
+        return { ...f, ...p };
+      } catch (error) {
+        console.warn(`権限取得エラー (ファイルID: ${f.id}):`, error.message);
+        // 権限取得に失敗した場合は空の権限情報を返す
+        return { ...f, permissions: [] };
+      }
     });
   }
 
@@ -57,13 +63,23 @@ function searchItems(folderId, q, supportsAllDrives = false, includeItemsFromAll
  * 指定されたファイルのIDを受け取って対象の権限を取得する関数
  * @param {string} fileId - ファイルのID
  * @param {boolean} [supportsAllDrives=true] - 共有ドライブを含める
- * @returns {Array} 権限一覧
+ * @returns {Object} 権限一覧（エラー時は空の権限情報）
  */
 function getPermissions(fileId, supportsAllDrives = true) {
-  return Drive.Permissions.list(fileId, {
-    fields: "permissions(id,emailAddress,role,type)",
-    supportsAllDrives,
-  });
+  try {
+    return Drive.Permissions.list(fileId, {
+      fields: "permissions(id,emailAddress,role,type)",
+      supportsAllDrives,
+    });
+  } catch (error) {
+    // 権限不足やファイルアクセス不可の場合
+    if (error.message.includes("sufficient permissions") || error.message.includes("not found") || error.message.includes("access denied")) {
+      console.warn(`権限取得スキップ (ファイルID: ${fileId}):`, error.message);
+      return { permissions: [] };
+    }
+    // その他のエラーは再スローする
+    throw error;
+  }
 }
 
 /**
